@@ -184,7 +184,7 @@ function print_check_mark($stack_size, $inst_count)
 		echo  "${BLK}${YELB}+500${RESET}";;
 		return ;
 	}
-	if (($stack_size <= 100 && $inst_count < 700) || ($stack_size > 100 && $inst_count < 5500))
+	if ((($stack_size == 2 || $stack_size == 3) && $inst_count <= 2) || ($stack_size <= 5 && $stack_size > 3 && $inst_count <= 12) || ($stack_size <= 100 && $stack_size > 5 && $inst_count < 700) || ($stack_size > 100 && $inst_count < 5500))
 		echo $ok;
 	else
 		echo $ko;
@@ -212,11 +212,14 @@ foreach ($NUMBERS as $number) {
 	$instractions = [];
 	exec($EXCUTABEL . " ".  $number . " 2> /dev/null", $instractions);
 	$count = count($instractions);
-	$result = exec('printf "' . implode("\n", $instractions) . '\n"' . " | ./checker " .  $number);
+	if (!empty($instractions))
+		$result = exec('printf "' . implode("\n", $instractions) . '\n"' . " | ./checker 2>/dev/null " .  $number);
+	else
+		$result = exec('printf ""' . " | ./checker 2>/dev/null " .  $number);
 
 	if ($result == "OK")
 		echo "${BLK}${GRNB} OK ${RESET}";
-	else
+	else if ($result == "KO")
 		echo "${BLK}${REDB} KO ${RESET}";
 	echo "         ";
 	print_check_mark(count(explode(" ", $number)), $count);
